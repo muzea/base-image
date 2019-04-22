@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+
+  web:
+    container_name: web
+    image: woodenfish42/hustoj-web
+    depends_on:
+      - mysql
+    volumes:
+      - "/opt/hustoj/config/db_info.inc.php:/www/include/db_info.inc.php"
+      - "/opt/hustoj/data:/home/judge/data"
+    ports:
+      - "80:80"
+    restart: always
+
+  judge:
+    container_name: judge
+    image: woodenfish42/hustoj-judge
+    depends_on:
+      - mysql
+    volumes:
+      - "/opt/hustoj/config/judge.conf:/home/judge/etc/judge.conf"
+      - "/opt/hustoj/data:/home/judge/data"
+    restart: always
+
+  mysql:
+    container_name: mysql
+    image: woodenfish42/hustoj-mysql
+    volumes:
+      - "/opt/hustoj/mysql:/var/lib/mysql"
+    restart: always
+
