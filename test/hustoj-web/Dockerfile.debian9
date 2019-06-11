@@ -1,0 +1,38 @@
+FROM woodenfish42/hustoj-base as build-env
+LABEL maintainer="muzea <mr.muzea@gmail.com>"
+
+
+FROM debian:9
+
+ENV TIMEZONE            Asia/Shanghai
+ENV PHP_MEMORY_LIMIT    512M
+ENV MAX_UPLOAD          50M
+ENV PHP_MAX_FILE_UPLOAD 200
+ENV PHP_MAX_POST        100M
+
+COPY --from=build-env /hustoj/trunk/web /www
+
+RUN set -ex \
+    && apt update \
+    && apt install \
+               nginx \
+               php-mcrypt \
+               php-mbstring \
+               php-gmp \
+               php-json \
+               php-mysql \
+               php-gd \
+               php-curl \
+               php-fpm -y \
+    && rm /etc/nginx/sites-enabled/default
+
+RUN sed -i "s|;*daemonize\s*=\s*yes|daemonize = no|g" /etc/php/7.0/fpm/php-fpm.conf \
+    && chmod -R o+rw /www/upload \
+    && mkdir -p /run/php
+
+COPY nginx/default.debian9.conf /etc/nginx/conf.d/default.conf
+WORKDIR /www
+EXPOSE 80
+
+CMD /usr/sbin/nginx && /usr/sbin/php-fpm7.0
+
