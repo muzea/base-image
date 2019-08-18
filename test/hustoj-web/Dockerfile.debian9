@@ -23,6 +23,7 @@ RUN set -ex \
                php-mysql \
                php-gd \
                php-curl \
+               php-xml \
                php-fpm -y \
     && rm /etc/nginx/sites-enabled/default
 
